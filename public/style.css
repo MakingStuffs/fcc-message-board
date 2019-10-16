@@ -1,0 +1,262 @@
+* {
+  margin: 0px;
+  padding: 0px;
+  font-family: monospace;
+  box-sizing: border-box;
+}
+
+body {
+  padding: 10px;
+  background-image: linear-gradient(#2C3066, #6F75BA);
+}
+
+.main {
+    position: relative;
+    padding: 2rem;
+}
+.replies {
+  position: absolute;
+  background-color: #8FD6A7;
+  top: 100%;
+  z-index: 2 !important;
+  padding: 2rem;
+}
+
+.reply {
+}
+
+.newReply {
+  margin: 10px 5px 10px 5px;
+}
+
+.id {
+  font-size: 10.5px;
+}
+
+.container {
+  padding: 3rem;
+}
+.boards-head {
+  margin: 7%;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.form-container, .thread, .submitNewThread {
+  display: inline-flex;
+  margin: 2rem auto;
+  background-color: #8FD6A7;
+  flex-direction: column;
+  position: relative;
+  min-width: 45%;
+}
+.submitNewThread {
+  padding: 2rem;
+  width: 70%;
+  position: fixed;
+  top: 15%;
+  left:15%;
+  z-index:3;
+}
+.threadPage {
+  position: unset !important;
+  display: block;
+  margin-top: 0;
+  padding-top: 0;
+  width: 70%;
+  margin-left:auto;
+  margin-right: auto;
+}
+.board-list-container {
+  padding: 2rem;
+}
+.board-list {
+  text-align: center;
+  overflow: scroll;
+  display: block;
+  background-color: #8FD6A7;
+}
+.board-item {
+  display: inline-block;
+  margin: 0.25rem 0.5rem;
+}
+.deleteThreadPage {
+  top: 25% !important;
+  width: 50%;
+}
+.replyPage {
+  position:relative !important;
+}
+.mainThread {
+  width: fit-content;
+  display: block;
+  margin: auto;
+  box-shadow: 0px 0px 10px 1px black;
+}
+.closeBtn {
+    content: '\f410';
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    right: 0.5rem;
+    top: 0.5rem;
+    font-size: 2rem;
+    color: #2C3066;
+    cursor:pointer;
+    transition: all 0.3s;
+}
+.closeBtn:hover {
+  color: #BA3052;
+  transform: scale(1.1);
+}
+.deleteThread > .closeBtn {
+  top: 0.3rem;
+  right: 0.3rem;
+  font-size: 1.5rem
+}
+
+.form-container {
+    padding: 2rem;
+}
+input[type="text"], [type="button"], input[type="password"], textarea, input[type="submit"], button {
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 1rem;
+  font-size: 1.5rem;
+  border: none;
+  width: 100%;
+  margin: 0.5rem auto;
+}
+input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
+  outline: none;
+}
+input[type="submit"], button, [type="button"] {
+  background-image: linear-gradient(to left, white 50%, #30BA5E 50%);
+  background-size: 200% 100%;
+  background-position: bottom right;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+}
+.delete > button, .delete > input[type="submit"] {
+  background-image: linear-gradient(to left, white 50%, #BA3052 50%) !important;
+  background-size: 200% 100%;
+  background-position: bottom right;
+}
+.report > input[type="submit"] {
+  background-image: linear-gradient(to left, white 50%, #CC7E02 50%) !important;
+  background-size: 200% 100%;
+  background-position: bottom right;
+}
+
+input[type="submit"]:hover, button:hover, .delete > button:hover .delete > input[type="submit"], [type="button"]:hover {
+  background-position: bottom left;
+  color: white;
+}
+nav {
+  width: 100%;
+  background-color: #8FD6A7;
+  text-align: center;
+  position: fixed;
+  top:0;
+  left: 0;
+  z-index:3;
+  box-shadow: 0px 0px 10px 1px black;
+}
+nav > button {
+  width: auto;
+  margin: 0.5rem;
+}
+nav >a {
+  text-decoration: none;
+}
+h1, h2 {
+  padding: 1rem;
+  background-color: #DEE2DF;
+  color: black;
+  font-size: 2rem;
+  text-align: center;
+  width: auto;
+}
+h4, .thread-text {
+  padding: 1rem;
+  background-color: #DEE2DF;
+  color: black;
+  font-size: 1.5rem;
+  text-align: center;
+}
+header {
+  padding: 2rem;
+  background-color: #8FD6A7;
+}
+.msg-info {
+  width: 100%;
+}
+.msg-info > p {
+  margin-top: 2rem;
+  margin-bottom: none !important;
+}
+.header-info, .msg-info {
+  margin: 3rem auto;
+  background-color: #BEDDC9;
+  font-size: 1.5rem;
+  padding: 2rem;
+  text-align: center;
+  width: 80%;
+}
+.header-info > p {
+  margin: 1rem 0;
+}
+.report, .delete {
+  width: 50% !important;
+  display: inline-block;
+  padding: 1rem;
+}
+.kill {
+  display: none !important;
+}
+.thread {
+  z-index: 0;
+}
+.deleteThread, #deleteReply {
+  position: absolute;
+  left: 25%;
+  top: -50%;
+  background-color: #8FD6A7;
+  padding: 2rem;
+  box-shadow: 0px 0px 10px 1px black;
+}
+.deleteBtn {
+  
+}
+.board-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.overlay {
+  position: fixed;
+  top:0;
+  left:0;
+  background-color:rgba(0,0,0,0.5);
+  z-index:1;
+  height: 100%;
+  width: 100%;
+}
+.active {
+  z-index: 2;
+}
+
+.hide {
+  opacity: 0;
+}
+a[type="button"]{
+  text-decoration: none;
+  -webkit-appearance: none;
+  color: inherit;
+}
+#boardList > a {
+  width: fit-content;
+  margin: 0.4rem;
+}
