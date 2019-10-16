@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Welcome to HyperDev!</title>
+    <meta name="description" content="A cool thing made with HyperDev" />
+    <link
+      id="favicon"
+      rel="icon"
+      href="https://hyperdev.com/favicon-app.ico"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/public/style.css" />
+  </head>
+  <body>
+    <div class="overlay kill">
+    </div>
+    <nav>
+      <a href="/" type="button">Home</a>
+      <button id="newTopic">
+        New Topic
+      </button>
+    </nav>
+    <header class="boards-head">
+      <h1 id="boardTitle"></h1>
+      <div class="header-info">
+        <p>
+          The following threads have been created on this board. 
+        </p>
+        <p>
+          If you would like to add to one of the topics or view it in full, click the correct button.
+        </p>
+        <p>
+          Likewise if you wish report or delete anything.
+        </p>
+      </div>
+    </header>
+
+    <div id="submitNewThread" class="submitNewThread kill hide">
+      <div class="closeBtn">
+        <i class="fas fa-window-close"></i>
+      </div>
+      <h3>Submit a new thread:</h3>
+      <form id="newThread" method="post" action="/api/">
+        <textarea
+          rows="8"
+          cols="120"
+          type="text"
+          placeholder="Thread text..."
+          name="text"
+          required=""
+        ></textarea
+        ><br />
+        <input
+          type="text"
+          placeholder="password to delete"
+          name="delete_password"
+          required=""
+        /><br />
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
+
+    <div id="boardDisplay" class="board-grid"></div>
+    <hr style="margin: 50px; margin-top: 200px" />
+
+    <script
+      src="https://code.jquery.com/jquery-2.2.1.min.js"
+      integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      $(function() {
+        var currentBoard = window.location.pathname.slice(3, -1);
+        var url = "/api/threads/" + currentBoard;
+        $("#boardTitle").text("Welcome to " + window.location.pathname);
+        $.ajax({
+          type: "GET",
+          url: url,
+          success: function(data) {
+            var boardThreads = [];
+            //
+            // THIS ARRAY SET UP IS FOR CODE READABILITIES AND TESTING!
+            // THIS IS NOT WHAT IT WOULD LOOK LIKE TO GO LIVE
+            //
+            data.threads.forEach(function(ele, i) {
+              var thread = ['<div class="thread">'];
+              thread.push('<div class="msg-info">');
+              thread.push(`<h3>${ele.text}</h3>`);
+              thread.push(
+                '<p class="id">id: ' + ele._id + " (" + ele.created_on + ")</p>"
+              );
+              thread.push('</div>');
+              thread.push('<div class="main">');
+              thread.push(
+                '<form id="reportThread" class="report"><input type="hidden" name="thread_id" value="' +
+                  ele._id +
+                  '"><input type="submit" value="Report"></form>'
+              );
+              thread.push(`<div class="delete"><button class="deleteBtn" data-index="delete-${i}">Delete</button></div>`);
+              thread.push(`<form id="deleteThread" class="kill deleteThread delete" data-index="del-form-${i}"><div class="closeBtn"><i class="fas fa-window-close"></i></div><input type="hidden" value="${ele._id}" name="thread_id" required=""><input type="text" placeholder="password" name="delete_password" required=""><input type="submit" value="Delete"></form>`);
+              thread.push(`<button class="reply-btn">Recent Replies</button>`);
+              thread.push(`</div><div class="replies kill" data-index="replies-${i}"><div class="closeBtn"><i class="fas fa-window-close"></i></div>`);
+              if(ele.replies.length > 0) {
+                var hiddenCount = ele.replies.length - 3;
+                if (hiddenCount < 1) {
+                  hiddenCount = 0;
+                }
+                thread.push(
+                  "<h5>" +
+                    ele.replies.length +
+                    " replies total (" +
+                    hiddenCount +
+                    ' hidden)- <a href="' +
+                    window.location.pathname +
+                    ele._id +
+                    '">See the full thread here</a>.</h5>'
+                );
+              } else {
+                thread.push(`<div class="msg-info"><h5>There aren't any replies to this topic. Be the first below.</h5></div>`);
+              }
+              ele.replies.forEach(function(rep) {
+                thread.push('<div class="reply">');
+                thread.push('<div class="msg-info">');
+                thread.push("<p>" + rep.text + "</p>");
+                thread.push(
+                  '<p class="id">id: ' +
+                    rep._id +
+                    " (" +
+                    rep.created_on +
+                    ")</p>"
+                );
+                thread.push('</div>');
+                thread.push("</div>");
+              });
+              thread.push('<div class="newReply">');
+              thread.push(
+                '<form action="/api/replies/' +
+                  currentBoard +
+                  '/" method="post" id="newReply">'
+              );
+              thread.push(
+                '<input type="hidden" name="thread_id" value="' + ele._id + '">'
+              );
+              thread.push(
+                '<textarea rows="5" cols="80" type="text" placeholder="Quick reply..." name="text" required=""></textarea><br>'
+              );
+              thread.push(
+                '<input type="text" placeholder="password to delete" name="delete_password" required=""><input style="margin-left: 5px" type="submit" value="Submit">'
+              );
+              thread.push("</form></div></div></div>");
+              boardThreads.push(thread.join(""));
+            });
+            $("#boardDisplay").html(boardThreads.join(""));
+            const replyBtns = document.querySelectorAll('.reply-btn');
+            for(let i = 0; i < replyBtns.length; i++) {
+              replyBtns[i].addEventListener('click', function(){
+                let temp = document.querySelector(`[data-index="replies-${i}"]`)
+                this.parentElement.parentElement.classList.toggle('active');
+                document.querySelector('.overlay').classList.toggle('kill');
+                temp.classList.toggle('kill');
+              });
+            };
+            const deleteBtns = document.querySelectorAll('.deleteBtn');
+            for(let i = 0; i < deleteBtns.length; i++) {
+              deleteBtns[i].addEventListener('click', function(){
+                let temp = document.querySelector(`[data-index="del-form-${i}"]`)
+                temp.classList.toggle('kill');
+                document.querySelector('.overlay').classList.toggle('kill');   
+                this.parentElement.parentElement.parentElement.classList.toggle('active');
+              });
+            }
+            const closeBtns = document.querySelectorAll('.closeBtn');
+            for(let i = 0; i < closeBtns.length; i++) {
+              closeBtns[i].querySelector('i').addEventListener('click', function() {
+                let thread = closeBtns[i].parentElement.parentElement.parentElement;
+                document.querySelector('.overlay').classList.toggle('kill');                
+                closeBtns[i].parentElement.classList.toggle('kill');
+                // Replies
+                if(this.parentElement.parentElement.parentElement.classList.contains('thread'))
+                  this.parentElement.parentElement.parentElement.classList.toggle('active');
+                // Delete
+                if(thread.classList.contains('thread'))
+                  thread.classList.toggle('active');
+                // New Thread
+                if(this.parentElement.parentElement.classList.contains('submitNewThread'))
+                  this.parentElement.parentElement.classList.toggle('hide');
+              });
+            }
+          }
+        });
+        document.querySelector('#newTopic').addEventListener('click', function(){
+          let temp = document.querySelector('.submitNewThread');
+            temp.classList.toggle('kill');
+            temp.classList.toggle('hide');
+            document.querySelector('.overlay').classList.toggle('kill');
+        });
+        $("#newThread").submit(function() {
+          $(this).attr("action", "/api/threads/" + currentBoard);
+        });
+
+        $("#boardDisplay").on("submit", "#reportThread", function(e) {
+          var url = "/api/threads/" + currentBoard;
+          $.ajax({
+            type: "PUT",
+            url: url,
+            data: $(this).serialize(),
+            success: function(data) {
+              alert(data);
+            }
+          });
+          e.preventDefault();
+        });
+        $("#boardDisplay").on("submit", "#reportReply", function(e) {
+          var url = "/api/replies/" + currentBoard;
+          $.ajax({
+            type: "PUT",
+            url: url,
+            data: $(this).serialize(),
+            success: function(data) {
+              alert(data);
+            }
+          });
+          e.preventDefault();
+        });
+        $("#boardDisplay").on("submit", "#deleteThread", function(e) {
+          var url = "/api/threads/" + currentBoard;
+          let temp = this;
+          $.ajax({
+            type: "DELETE",
+            url: url,
+            data: $(this).serialize(),
+            success: function(data) {
+              alert(data);
+            }
+          });
+          e.preventDefault();
+        });
+        $("#boardDisplay").on("submit", "#deleteReply", function(e) {
+          var url = "/api/replies/" + currentBoard;
+          $.ajax({
+            type: "DELETE",
+            url: url,
+            data: $(this).serialize(),
+            success: function(data) {
+              alert(data);
+            }
+          });
+          e.preventDefault();
+        });
+      });
+    </script>
+  </body>
+</html>
