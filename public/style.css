@@ -197,6 +197,7 @@ header {
 .msg-info > p {
   margin-top: 2rem;
   margin-bottom: none !important;
+  word-break:break-all;
 }
 .header-info, .msg-info {
   margin: 3rem auto;

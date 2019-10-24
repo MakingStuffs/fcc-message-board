@@ -100,44 +100,39 @@ module.exports = function (app) {
       Board.deleteMany({}).exec();
       Thread.deleteMany({}).exec();
     */
+    // Find out which board we are using
+    const title = req.params.board;
+    // Get the board document
+    const board = await (async () => {
       try {
-        // Find out which board we are using
-        const title = req.params.board;
-        // Get the board document
-        const board = await (async () => {
-          try {
-            // Get a doc of the board with threads populated
-            const doc = await boardQuery(title).populate({ 
-              path: 'threads',
-              populate: {
-                path: 'replies',
-                select: 'board_id _id text created_on bumped_on',
-                options: {
-                  limit: 3,
-                  sort: {
-                    created_on: -1
-                  }
-                }
-              },
-              select: 'board_id _id text created_on bumped_on',
-              options: {
-                limit: 10,
-                sort: { 
-                  bumped_on: -1 
-                }
+        // Get a doc of the board with threads populated
+        const doc = await boardQuery(title).populate({ 
+          path: 'threads',
+          populate: {
+            path: 'replies',
+            select: 'board_id _id text created_on bumped_on',
+            options: {
+              limit: 3,
+              sort: {
+                created_on: -1
               }
-            }).exec();
-            if(!doc) return { error: `No board matching ${title}` };
-            return await doc;
-          } catch(err) {
-            return err;
-          }            
-        })();
-        return res.json(board);          
-      // Catch errors
+            }
+          },
+          select: 'board_id _id text created_on bumped_on',
+          options: {
+            limit: 10,
+            sort: { 
+              bumped_on: -1 
+            }
+          }
+        }).exec();
+        if(!doc) return { error: `No board matching ${title}` };
+        return await doc;
       } catch(err) {
         return err;
-      }
+      }            
+    })();
+    return res.json(board);          
     })
     // Post, create a thread/board
     .post(async (req, res) => {
@@ -148,7 +143,6 @@ module.exports = function (app) {
         let delete_password = req.body.delete_password;
         // Get a doc for the board and create one if there isn't one
         const board = await ( async () => {
-          try {
             let board = await boardQuery(title).exec();
             if(board) return board;
             if(!board) {
@@ -157,9 +151,6 @@ module.exports = function (app) {
               });
               return newBoard.save();
             }
-          } catch(err) {
-            return err;
-          }
         })();
         // Create a thread for the board using a self invoked function
         const thread = await ( async () => {
